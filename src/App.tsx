@@ -1,46 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import Day from './components/Day';
+import dayjs from 'dayjs';
+import { Weekdays, weekdays } from './constants';
+import { IDay } from './types';
 
 function App() {
   const [count, setCount] = useState(0);
-
-  const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  const [days, setDays] = useState<IDay[]>([]);
 
   const arr = new Array(14).fill(null).map((_, i) => i + 1);
 
+  useEffect(() => {
+    const today = dayjs();
+    const dayOfWeek = today.day();
+
+    const firstDay = dayjs().date(1);
+    const firstDayOfWeek = firstDay.day();
+    // const offset = Weekdays[firstDayOfWeek];
+
+    const daysInMonth = today.daysInMonth();
+
+    const days1 = new Array(daysInMonth).fill(null).map((_, idx) => {
+      const date = dayjs().date(idx + 1);
+      return {
+        date: idx + 1,
+        day: date.day(),
+        name: date.format('dddd'),
+        formattedDate: date.format('YYYY/MM/DD'),
+        obj: date,
+      };
+    });
+    setDays(days1);
+    console.log(days1);
+  }, []);
+
   return (
     <>
+      <h2>{dayjs().format('MMMM')}</h2>
       <div className="calendar_container">
-        {arr.map((i) => (
-          <Day key={i} />
+        {days.map((day) => (
+          <Day key={day.formattedDate} day={day} />
         ))}
       </div>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
     </>
   );
 }
